@@ -57,6 +57,7 @@ while wait(wait) do
 
 			if word and not intable then
 				game:GetService("ReplicatedStorage").RemoteEvents.StageEvent:FireServer("Typed", string.upper(word))
+				table.insert(used_words, word)
 			end
 			print("-----------------------")
 		end
