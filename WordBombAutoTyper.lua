@@ -79,13 +79,6 @@ function createText(text)
 	end)
 end
 
-shared.used_words = shared.used_words or {}
-local file;
-
-pcall(function()
-	file = readfile("words.txt")
-end)
-
 function shuffle(tbl)
   for i=1, table.getn(tbl) do
     local j = math.random(i)
@@ -104,33 +97,46 @@ function MergeTables(tbloftables)
 	return newTable
 end
 
-
 local AllDicts = {}
 
+shared.used_words = shared.used_words or {}
+local file;
+local file2;
+local file3;
+
+pcall(function()
+	file = readfile("22k.txt")
+	file2 = readfile("10k.txt")
+	file3 = readfile("100k.txt")
+end)
+
 if not file then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Tesseracting/Uploads/master/words.txt"))()
-	writefile("words.txt", WordBombWords)
+	local k22 = game:HttpGet("https://raw.githubusercontent.com/Tesseracting/Uploads/master/words.txt")
+	AllDicts["22k"] = shuffle(k22:split("\n"))
+	writefile("22k.txt", k22)
+	createText("Downloaded 22k word list.")
 else
-	loadstring(file)()
+	AllDicts["22k"] = shuffle(file:split("\n"))
 end
-words = WordBombWords
-createText("Shuffling: 22k Dictionary")
-words = shuffle(words)
-AllDicts["22k"] = words
 
-local newDictWords = game:HttpGet("https://www.mit.edu/~ecprice/wordlist.10000")
-local newdict = newDictWords:split("\n")
-createText("Shuffling: 10k Dictionary")
-newdict = shuffle(newdict)
-AllDicts["10k"] = newdict
+if not file2 then
+	local k10 = game:HttpGet("https://www.mit.edu/~ecprice/wordlist.10000")
+	AllDicts["10k"] = shuffle(k10:split("\n"))
+	writefile("10k.txt", k10)
+	createText("Downloaded 10k word list.")
+else
+	AllDicts["10k"] = shuffle(file2:split("\n"))
+end
 
-local newDictWords = game:HttpGet("https://www.mit.edu/~ecprice/wordlist.100000")
-local newdict = newDictWords:split("\n")
-createText("Shuffling: 100k Dictionary")
-newdict = shuffle(newdict)
-AllDicts["100k"] = newdict
+if not file2 then
+	local k100 = game:HttpGet("https://www.mit.edu/~ecprice/wordlist.100000")
+	AllDicts["100k"] = shuffle(k100:split("\n"))
+	writefile("100k.txt", k100)
+	createText("Downloaded 100k word list.")
+else
+	AllDicts["100k"] = shuffle(file2:split("\n"))
+end
 
-createText("Shuffling: All Dictionary")
 AllDicts.All = shuffle(MergeTables({AllDicts["22k"], AllDicts["10k"], AllDicts["100k"]}))
 
 local library = loadstring(game:HttpGet("https://pastebin.com/raw/eWKgbdix", true))()
