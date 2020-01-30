@@ -97,6 +97,29 @@ function MergeTables(tbloftables)
 	return newTable
 end
 
+function TableCheck(thetable, value)
+	for iter, v in pairs(thetable) do
+		if v == value or iter == value then
+			return true, {iter, value}
+		end
+	end
+	return false
+end
+
+function removeDuplicates(tbl)
+	local newTable, count = {}, 0
+	for iter, a in pairs(tbl) do
+		if not TableCheck(newTable, a) then
+			table.insert(newTable, a)
+		else
+			count = count + 1
+		end
+		if iter % 1000 == 0 then wait(0) end
+	end
+	createText("Removed " .. count .. " duplicate words.")
+	return newTable
+end
+
 local AllDicts = {}
 
 shared.used_words = shared.used_words or {}
@@ -139,6 +162,18 @@ end
 
 AllDicts.All = shuffle(MergeTables({AllDicts["22k"], AllDicts["10k"], AllDicts["100k"]}))
 
+local screenGui;
+local connection;
+
+function guicheck(child)
+	if child.Name == "ScreenGui" then
+		screenGui = child
+		connection:Disconnect()
+	end
+end
+
+connection = game.CoreGui.ChildAdded:Connect(guicheck)
+
 local library = loadstring(game:HttpGet("https://pastebin.com/raw/eWKgbdix", true))()
 local window = library:CreateWindow('Word Bomber')
 local min, max, waittime = 3, 8, 0
@@ -152,13 +187,15 @@ local gjhjhjhjhjjhh = window:Dropdown("Dictionaries", {
 			"22k";
 			"100k";
 		}
-})
+}, function(new) createText("Now using " .. new .. " dictionary.") end)
 local fugufgufgufuf = window:Toggle("Realistic Speed", {flag = "realspeed"})
 local girgiurgiigrr = window:Toggle("Miss 80%", {flag = "miss"})
+local fugufgufufuuu = window:Toggle("Biggest Words", {flag = "big"})
 local ghirugurgurgu = window:Toggle("RConsole", {flag = "rconsole"})
 local gfdgdfjkgjkdf = window:Box('Minimum Letters', {flag = "min"; type = 'number';}, function(new, old, enter) min = tonumber(new) end)
 local sfuiguisfgiuf = window:Box('Maximum Letters', {flag = "max"; type = 'number';}, function(new, old, enter) max = tonumber(new) end)
 local fgfggfhfhhhhh = window:Box('Delay', {flag = "waittime"; type = 'number';}, function(new, old, enter) waittime = tonumber(new) end)
+local fguiugfufgufu = window:Button("Destroy", function() window.flags.autobot = false screenGui:Destroy() end)
 
 local tell = function(Message, Type)
 	if Type then Type = string.lower(Type) end
@@ -192,19 +229,31 @@ end
 
 function getWord(contains, min, max)
 	local dictionaryuse = AllDicts[window.flags.dictionary]
-	if dictionaryuse then
+	local num = 1
+
+	if window.flags.big then
+		num = 5
+	end
+	local bigwords = {}
+
+	for a=1, num do
 		for i, b in pairs(dictionaryuse) do
-		  if string.len(b) >= min and string.len(b) <= max and string.match(b, contains) and not TableCheck(shared.used_words, b) then
+		  if string.match(b, contains) and string.len(b) >= min and string.len(b) <= max and not TableCheck(shared.used_words, b) then
 				table.insert(shared.used_words, b)
-				return b
+				if window.flags.big then
+					table.insert(bigwords, b)
+				else
+					return b
+				end
 		  end
 		end
-	else
-		createText("NO DICTIONARY FOUND PLS THERE'S ERROR")
 	end
+	table.sort(bigwords, function(a,b) return #a>#b end)
+	return bigwords[1]
 end
 
 while wait(0.1) do
+	if not screenGui then break end
 	if window.flags["autobot"] then
 		local titleframe = game.Players.LocalPlayer.PlayerGui.WordBombUI.UIContainer.StageContainer.PC.TitleFrame
 		local title = titleframe.Title.Text
