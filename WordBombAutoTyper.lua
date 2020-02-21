@@ -134,7 +134,7 @@ pcall(function()
 end)
 
 if not file then
-	local k22 = game:HttpGet("https://raw.githubusercontent.com/Tesseracting/Uploads/master/words.txt")
+	local k22 = game:HttpGet("https://raw.githubusercontent.com/3xjn/Uploads/master/words.txt")
 	AllDicts["22k"] = shuffle(k22:split("\n"))
 	writefile("22k.txt", k22)
 	createText("Downloaded 22k word list.")
