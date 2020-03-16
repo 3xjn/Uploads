@@ -176,7 +176,7 @@ connection = game.CoreGui.ChildAdded:Connect(guicheck)
 
 local library = loadstring(game:HttpGet("https://pastebin.com/raw/eWKgbdix", true))()
 local window = library:CreateWindow('Word Bomber')
-local min, max, waittime = 3, 8, 0
+local min, max, waittime = 3, 8, 3
 
 local ghfggfhgfhfgh = window:Toggle("Autobot", {flag = "autobot"})
 local gjhjhjhjhjjhh = window:Dropdown("Dictionaries", {
@@ -189,9 +189,6 @@ local gjhjhjhjhjjhh = window:Dropdown("Dictionaries", {
 		}
 }, function(new) createText("Now using " .. new .. " dictionary.") end)
 local fugufgufgufuf = window:Toggle("Realistic Speed", {flag = "realspeed"})
-local girgiurgiigrr = window:Toggle("Miss 80%", {flag = "miss"})
-local fugufgufufuuu = window:Toggle("Biggest Words", {flag = "big"})
-local ghirugurgurgu = window:Toggle("RConsole", {flag = "rconsole"})
 local gfdgdfjkgjkdf = window:Box('Minimum Letters', {flag = "min"; type = 'number';}, function(new, old, enter) min = tonumber(new) end)
 local sfuiguisfgiuf = window:Box('Maximum Letters', {flag = "max"; type = 'number';}, function(new, old, enter) max = tonumber(new) end)
 local fgfggfhfhhhhh = window:Box('Delay', {flag = "waittime"; type = 'number';}, function(new, old, enter) waittime = tonumber(new) end)
@@ -229,28 +226,43 @@ end
 
 function getWord(contains, min, max)
 	local dictionaryuse = AllDicts[window.flags.dictionary]
-	local num = 1
+	local word;
 
-	if window.flags.big then
-		num = 5
+	for i, b in pairs(dictionaryuse) do
+	  if string.match(b, contains) and string.len(b) >= min and string.len(b) <= max and not TableCheck(shared.used_words, b) then
+			table.insert(shared.used_words, b)
+			return b
+	  end
 	end
-	local bigwords = {}
 
-	for a=1, num do
-		for i, b in pairs(dictionaryuse) do
-		  if string.match(b, contains) and string.len(b) >= min and string.len(b) <= max and not TableCheck(shared.used_words, b) then
-				table.insert(shared.used_words, b)
-				if window.flags.big then
-					table.insert(bigwords, b)
-				else
-					return b
-				end
-		  end
-		end
-	end
-	table.sort(bigwords, function(a,b) return #a>#b end)
-	return bigwords[1]
+	return word
 end
+
+local oh_get_gc = getgc or false
+local oh_is_x_closure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
+local oh_get_info = debug.getinfo or getinfo or false
+local oh_set_upvalue = debug.setupvalue or setupvalue or setupval or false
+
+if not oh_get_gc and not oh_is_x_closure and not oh_get_info and not oh_set_upvalue then
+    warn("Your exploit does not support this script")
+    return
+end
+
+local oh_find_function = function(name)
+    for i,v in pairs(oh_get_gc()) do
+        if type(v) == "function" and not oh_is_x_closure(v) then
+            if oh_get_info(v).name == name then
+                return v
+            end
+        end
+    end
+end
+
+local oh_updatePossessor = oh_find_function("updatePossessor")
+local oh_index = 2 -- replace this with the index of the upvalue
+
+local word_upvalue = debug.getupvalue(oh_updatePossessor, oh_index)
+createText("Successfully updatePossessor upvalue")
 
 while wait(0.1) do
 	if not screenGui then break end
@@ -263,25 +275,21 @@ while wait(0.1) do
 			local wa = waittime
 
 			if word then
-				if window.flags.miss then
-					if math.random(1, 8) == 8 then
-						createText("Missing this word.")
-						word = "fuckniggers"
+				createText("Got word " .. word)
+				if window.flags.realspeed then
+					if word_upvalue.state.GetBombType() == 1 then
+						wa = (string.len(word)/3)
 					else
-						createText("Got word " .. word)
+						wa = (string.len(word)/3.5)
 					end
 				else
-					createText("Got word " .. word)
-				end
-				if window.flags.realspeed then
-					wa = (string.len(word)/3)
+					wa = values.delay
 				end
 				tell("Waiting " .. wa)
 				wait(wa)
 				tell("Getting word that contains " .. contains)
 				tell("Greater than or equal to " .. min)
 				tell("Smaller than or equal to " .. max)
-				if word == "fuckniggers" then tell("Missing this word.") else tell("Got word " .. tostring(word)) end
 				tell("-----------------------")
 
 				game:GetService("ReplicatedStorage").RemoteEvents.StageEvent:FireServer("Typed", string.upper(word))
