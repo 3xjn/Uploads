@@ -68,14 +68,18 @@ function createText(text)
 			end
 		end)
 
-		TS:Create(Overall, TweenInfo.new(0.25), {Position = UDim2.new(0.0114140771, 0, 0.0410714298, 0)}):Play()
-		wait(.25)
 		wait(2)
+
+		for i=0, 0.01, 1 do
+			Overall.BackgroundTransparency = i
+			NotifyText.BackgroundTransparency = i
+			wait(0)
+		end
+
+		Overall:Destroy()
+
 		removing = true
 		num = num - 1
-		TS:Create(Overall, TweenInfo.new(.25), {Position = UDim2.new(-.25, 0, -.25, 0)}):Play()
-		wait(.25)
-		Overall:Destroy()
 	end)
 end
 
