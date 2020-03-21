@@ -269,6 +269,10 @@ local word_upvalue = debug.getupvalue(oh_updatePossessor, oh_index)
 createText("Successfully updatePossessor upvalue")
 
 while wait(0.1) do
+	pcall(function()
+		word_upvalue = debug.getupvalue(oh_updatePossessor, oh_index)
+		game:GetService('ReplicatedStorage').RemoteEvents.StageEvent:FireServer("JoinGame")
+	end)
 	if not screenGui then break end
 	if window.flags["autobot"] then
 		local titleframe = game.Players.LocalPlayer.PlayerGui.WordBombUI.UIContainer.StageContainer.PC.TitleFrame
@@ -287,18 +291,16 @@ while wait(0.1) do
 						wa = (string.len(word)/3.5)
 					end
 				else
-					wa = values.delay
+					pcall(function()
+						wa = values.delay
+					end)
+					if not wa then
+						wa = waittime
+					end
 				end
-				tell("Waiting " .. wa)
-				wait(wa)
-				tell("Getting word that contains " .. contains)
-				tell("Greater than or equal to " .. min)
-				tell("Smaller than or equal to " .. max)
-				tell("-----------------------")
-
 				game:GetService("ReplicatedStorage").RemoteEvents.StageEvent:FireServer("Typed", string.upper(word))
 			elseif not word and string.match(title, "Quick") then
-				tell("No word could be found", "error")
+				createText("No word could be found", "error")
 			end
 		end
 	end
