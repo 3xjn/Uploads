@@ -23,15 +23,14 @@ function getOre()
   return ore
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
-  local enemy = getOre(oreName)
-
+while wait(0) do
   local hack = getsenv(game.Players.LocalPlayer.PlayerGui.MyScreenGui.TurretFrame.Button1.TurretLocalScript)
   local call = debug.getupvalues(hack.fire)
   local ccall = debug.getupvalues(call[7].Fire)[22]
   local firefunc = debug.getupvalues(call[7].Fire)[2]
   debug.setupvalue(ccall,1,getfenv(1))
   local cf = CFrame.new(0,0,0)
+  local enemy = getOre()
   if enemy then
     local center = enemy:WaitForChild'CenterPoint'
     ccall(firefunc,center,cf,enemy,enemy,center)
