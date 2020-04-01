@@ -37,7 +37,7 @@ China
 Colombia
 Comoros
 Costa Rica
-Côte d’Ivoire (Ivory Coast)
+Côte d’Ivoire
 Croatia
 Cuba
 Cyprus
@@ -47,7 +47,7 @@ Denmark
 Djibouti
 Dominica
 Dominican Republic
-East Timor (Timor-Leste)
+East Timor
 Ecuador
 Egypt
 El Salvador
@@ -116,7 +116,7 @@ Mongolia
 Montenegro
 Morocco
 Mozambique
-Myanmar (Burma)
+Myanmar
 Namibia
 Nauru
 Nepal
@@ -125,7 +125,7 @@ New Zealand
 Nicaragua
 Niger
 Nigeria
-North Korea (Democratic People's Republic of Korea)
+North Korea
 North Macedonia
 Norway
 Oman
