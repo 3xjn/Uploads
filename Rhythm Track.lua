@@ -21,6 +21,7 @@ local destroyed = false
 window:Toggle("On", {flag = "on"})
 window:Toggle("Tracers", {flag = "tracers"})
 window:Toggle("Distance", {flag = "show_dist"})
+window:Toggle("Rainbow", {flag = "rain"})
 window:Bind("Hide", {
 	flag = "hide";
 	kbonly = true;
@@ -154,7 +155,8 @@ local KeyToVKey = {
 	["Equal"] = 187;
 }
 
-local controls = game.Players.LocalPlayer.Controls
+local player = game.Players.LocalPlayer
+local controls = player.Controls
 
 function conv(obj)
 	local color = tostring(obj.BrickColor)
@@ -204,37 +206,33 @@ local holder = {
 	["Middle"] = {};
 }
 
+local rainColor;
+
+spawn(function()
+	while true do
+		for i = 0, 1, 0.001 do
+			rainColor = Color3.fromHSV(i,1,1)
+			wait(0)
+		end
+	end
+end)
+
+local difficulty = ""
+
 function doit(c)
+	difficulty = player.Difficulty.Value
 	if c.ClassName == 'Part' and c:FindFirstChild('Mesh') and not destroyed then
-		--c.Mesh:Destroy()
 		local a = conv(c)
 
 		local key = a.key
 		local check = a.check
 
+		local col = c.BrickColor
+
 		local checktbl = holder[check.Name]
 		table.insert(checktbl, c)
 
-		--print(c.Name .. ': ' .. key .. ', ' .. tostring(check) .. ", " .. tostring(c.BrickColor))
 		local ay;
-		--[[if window.flags.show_dist then
-			local cba = Instance.new("SurfaceGui")
-			cba.Adornee = c
-			cba.AlwaysOnTop = true
-			cba.Face = "Left"
-			cba.LightInfluence = 0
-			cba.Parent = c
-
-			ay = Instance.new("TextLabel")
-			ay.BackgroundTransparency = 1
-			ay.TextColor3 = Color3.fromRGB(223, 38, 38)
-			ay.Size = UDim2.new(0.5, 0, 0.5, 0)
-			ay.TextScaled = true
-			ay.Font = Enum.Font.SourceSansLight
-			ay.Rotation = -90
-			ay.Parent = cba
-		end--]]
-
 		local close = false
 		local line;
 
@@ -256,7 +254,6 @@ function doit(c)
 
 		if window.flags.show_dist then
 			text = Drawing.new("Text")
-			--local clr = c.BrickColor.Color
 			text.Color = Color3.new(1, 1, 1)
 			text.Position = WorldPointToViewPoint(c.Position)
 			text.Size = 60.0
@@ -268,13 +265,18 @@ function doit(c)
 
 		local conc;
 
-		conc = run.RenderStepped:Connect(function()
-			if not close then
+		if window.flags.rain then
+			c.Color = rainColor
+		end
+
+		--conc = run.RenderStepped:Connect(function()
+		conc = c.Changed:Connect(function(prop)
+			if prop == "Position" and not close then
 				local dist = (check.Position - c.Position).magnitude
 				
-				if dist <= 0.29 and window.flags.on then -- If it on the corresponding block
-					table.remove(checktbl, 1)
+				if dist <= 0.25 and window.flags.on then -- If it on the corresponding block
 					presskey(key)
+					table.remove(checktbl, 1)
 					pcall(function() 
 						line:Remove() 
 						text.Visible = false
@@ -297,29 +299,23 @@ function doit(c)
 					close = true
 				end
 
-				if window.flags.show_dist then
-					pcall(function()
-						if checktbl[1] == c then -- and dist <= 25 then
-							--text.Size = map(dist, 0, 30, 0, 60)
-							text.Visible = true
-							--text.Position = WorldPointToViewPoint(c.Position)
-							text.Text = tostring(round(dist, 2))
-						end
-					end)
-				end
-
-				spawn(function()
+				--[[spawn(function()
 					pcall(function()
 						if window.flags.tracers then
 							if checktbl[1] == c then -- and dist <= 15 then
 								line.Visible = true
 							end
-
 							line.From = WorldPointToViewPoint(check.Position + Vector3.new(0, check.Size.Y/2, 0))
 							line.To = WorldPointToViewPoint(c.Position - Vector3.new(0, check.Size.Y/2, 0))
 						end
+						if window.flags.show_dist then
+							if checktbl[1] == c then -- and dist <= 25 then
+								text.Visible = true
+								text.Text = tostring(round(dist, 2))
+							end
+						end
 					end)
-				end)
+				end)--]]
 			end
 		end)
 	end

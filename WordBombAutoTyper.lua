@@ -1,6 +1,8 @@
 local words = WordBombWords
 local notifytext = game.CoreGui:FindFirstChild("Text")
+local http = game:GetService("HttpService")
 local TS = game:GetService("TweenService")
+local TI = TweenInfo.new(1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut)
 
 if not notifytext then
 	notifytext = Instance.new("ScreenGui")
@@ -70,11 +72,9 @@ function createText(text)
 
 		wait(2)
 
-		for i=0, 0.01, 1 do
-			Overall.BackgroundTransparency = i
-			NotifyText.BackgroundTransparency = i
-			wait(0)
-		end
+		TS:Create(Overall, TI, {BackgroundTransparency = 1}):Play()
+		TS:Create(Sidebar, TI, {BackgroundTransparency = 1}):Play()
+		TS:Create(NotifyText, TI, {TextTransparency = 1}):Play()
 
 		Overall:Destroy()
 
@@ -182,21 +182,22 @@ local library = loadstring(game:HttpGet("https://pastebin.com/raw/eWKgbdix", tru
 local window = library:CreateWindow('Word Bomber')
 local min, max, waittime = 3, 8, 3
 
-local ghfggfhgfhfgh = window:Toggle("Autobot", {flag = "autobot"})
-local gjhjhjhjhjjhh = window:Dropdown("Dictionaries", {
+window:Toggle("Autobot", {flag = "autobot"})
+window:Toggle("Realistic Speed", {flag = "realspeed"})
+window:Dropdown("Dictionaries", {
 	flag = "dictionary";
 		list = {
-			"All";
 			"10k";
 			"22k";
 			"100k";
+			"All";
+			"Datamuse API";
 		}
 }, function(new) createText("Now using " .. new .. " dictionary.") end)
-local fugufgufgufuf = window:Toggle("Realistic Speed", {flag = "realspeed"})
-local gfdgdfjkgjkdf = window:Box('Minimum Letters', {flag = "min"; type = 'number';}, function(new, old, enter) min = tonumber(new) end)
-local sfuiguisfgiuf = window:Box('Maximum Letters', {flag = "max"; type = 'number';}, function(new, old, enter) max = tonumber(new) end)
-local fgfggfhfhhhhh = window:Box('Delay', {flag = "waittime"; type = 'number';}, function(new, old, enter) waittime = tonumber(new) end)
-local fguiugfufgufu = window:Button("Destroy", function() window.flags.autobot = false screenGui:Destroy() end)
+window:Box('Minimum Letters', {flag = "min"; type = 'number';}, function(new, old, enter) min = tonumber(new) end)
+window:Box('Maximum Letters', {flag = "max"; type = 'number';}, function(new, old, enter) max = tonumber(new) end)
+window:Box('Delay', {flag = "waittime"; type = 'number';}, function(new, old, enter) waittime = tonumber(new) end)
+window:Button("Destroy", function() window.flags.autobot = false screenGui:Destroy() end)
 
 local tell = function(Message, Type)
 	if Type then Type = string.lower(Type) end
@@ -229,17 +230,34 @@ function TableCheck(thetable, value)
 end
 
 function getWord(contains, min, max)
-	local dictionaryuse = AllDicts[window.flags.dictionary]
 	local word;
-
-	for i, b in pairs(dictionaryuse) do
-	  if string.match(b, contains) and string.len(b) >= min and string.len(b) <= max and not TableCheck(shared.used_words, b) then
-			table.insert(shared.used_words, b)
-			return b
-	  end
+	local dictionaryuse;
+	local dict = window.flags.dictionary
+	local a = false
+	if dict == "Datamuse API" then
+		local results = game:HttpGet(string.format("https://api.datamuse.com/words?sp=*%s*", contains))
+		if results then
+			results = http:JSONDecode(results)
+			dictionaryuse = results
+			a = true
+		end 
+	else
+		dictionaryuse = AllDicts[dict]
 	end
 
-	return word
+	for i, b in pairs(dictionaryuse) do
+		c = b
+		if dict == "Datamuse API" then
+			c = b.word
+		end
+		if string.match(c, contains) and string.len(c) >= min and string.len(c) <= max and not TableCheck(shared.used_words, c) then
+			table.insert(shared.used_words, c)
+			if dict == "Datamuse API" then
+				b = b.word
+			end
+			return b
+		end
+	end
 end
 
 local oh_get_gc = getgc or false
@@ -291,13 +309,9 @@ while wait(0.1) do
 						wa = (string.len(word)/3.5)
 					end
 				else
-					pcall(function()
-						wa = values.delay
-					end)
-					if not wa then
-						wa = waittime
-					end
+					wa = window.flags.delay or waittime
 				end
+				wait(wa)
 				game:GetService("ReplicatedStorage").RemoteEvents.StageEvent:FireServer("Typed", string.upper(word))
 			elseif not word and string.match(title, "Quick") then
 				createText("No word could be found", "error")
