@@ -5,11 +5,15 @@ local list = {
 
 local plrs = game.Players
 local lplr = plrs.LocalPlayer
-local sound = Instance.new("Sound")
-sound.Volume = 1.5
-sound.MaxDistance = math.huge
-sound.Looped = true
-sound.Parent = workspace
+local sound = workspace:FindFirstChildOfClass("Sound")
+
+if not sound then
+    sound = Instance.new("Sound")
+    sound.Volume = 1.5
+    sound.MaxDistance = math.huge
+    sound.Looped = true
+    sound.Parent = workspace
+end
 
 function message(msg)
     game:GetService('StarterGui'):SetCore("ChatMakeSystemMessage",
@@ -31,26 +35,40 @@ local commands = {
     ["play "] = function(msg)
         local id = tonumber(string.sub(msg, 6, string.len(msg)))
         if id then
-            lplr.OsPlatform = id
+            sound.SoundId = "rbxassetid://" .. id
+            local start = tick()
+            local now;
+            local done;
+            repeat now = tick() if now-start > 5 then done = true end wait() until sound.IsLoaded
+            if done then
+                messsage("Error loading sound.")
+            else
+                message("Now playing " .. id .. ".")
+            end
         end
     end;
     ["vol "] = function(msg) 
         local num = tonumber(string.sub(msg, 5, string.len(msg)))
         if num then
             sound.Volume = num
+            message("Volume set to " .. num .. ".")
         end
     end;
     ["stop"] = function()
         sound:Pause()
+        message("Song paused.")
     end;
     ["pause"] = function()
         sound:Pause()
+        message("Song paused.")
     end;
     ["resume"] = function()
         sound:Play()
+        message("Song resumed.")
     end;
     ["play"] = function()
         sound:Play()
+        message("Song resumed.")
     end
 }
 
@@ -62,12 +80,14 @@ function check(p)
     if list[p.UserId] then
         p.Changed:Connect(function(state)
             if state == "OsPlatform" then
+                local msg = p.OsPlatform
                 for command, func in pairs(commands) do
                     local len = string.len(command)
                     local a = string.sub(msg, 1, len)
                     if a == command then
                         wait()
                         func(msg)
+                        break
                     end
                 end
             end
