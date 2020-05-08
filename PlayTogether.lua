@@ -39,7 +39,7 @@ local commands = {
             local start = tick()
             local now;
             local done;
-            wait(0.25)
+            repeat wait() until sound.IsLoaded 
             sound:Play()
             message("Now playing " .. id .. ".")
         end
@@ -70,6 +70,7 @@ local commands = {
 }
 
 lplr.Chatted:Connect(function(msg)
+    wait()
     lplr.OsPlatform = msg
 end)
 
@@ -82,7 +83,6 @@ function check(p)
                     local len = string.len(command)
                     local a = string.sub(msg, 1, len)
                     if a == command then
-                        wait()
                         func(msg)
                         break
                     end
