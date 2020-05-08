@@ -39,13 +39,9 @@ local commands = {
             local start = tick()
             local now;
             local done;
-            repeat now = tick() if now-start > 5 then done = true end wait() until sound.IsLoaded
-            if done then
-                messsage("Error loading sound.")
-            else
-                sound:Play()
-                message("Now playing " .. id .. ".")
-            end
+            wait(0.25)
+            sound:Play()
+            message("Now playing " .. id .. ".")
         end
     end;
     ["vol "] = function(msg) 
