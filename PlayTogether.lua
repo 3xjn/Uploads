@@ -43,6 +43,7 @@ local commands = {
             if done then
                 messsage("Error loading sound.")
             else
+                sound:Play()
                 message("Now playing " .. id .. ".")
             end
         end
