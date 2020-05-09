@@ -37,11 +37,14 @@ local commands = {
         if id then
             sound.SoundId = "rbxassetid://" .. id
             local start = tick()
-            local now;
             local done;
-            repeat wait() until sound.IsLoaded 
-            sound:Play()
-            message("Now playing " .. id .. ".")
+            repeat if tick()-start > 5 then done = true end wait() until sound.IsLoaded or done
+            if done then
+                message("Error loading music.")
+            else
+                sound:Play()
+                message("Now playing " .. id .. ".")
+            end
         end
     end;
     ["vol "] = function(msg) 
