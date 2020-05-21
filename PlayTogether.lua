@@ -1,6 +1,7 @@
 local list = {
     [139121289] = true; -- 3xjn
     [102102634] = true -- d0xycycl1n3
+    [56712363] = true
 }
 
 local plrs = game.Players
