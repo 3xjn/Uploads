@@ -26,6 +26,13 @@ pitch.Enabled = true
 pitch.Parent = sound
 local start = game:GetService('StarterGui')
 
+-- Require the ChatSettings module (wait for it to load)
+local Chat = game:GetService("Chat")
+local ClientChatModules = Chat:WaitForChild("ClientChatModules")
+local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+-- Change settings like you would with any other table.
+ChatSettings.BubbleChatEnabled = false
+
 function message(msg)
     wait()
     start:SetCore("ChatMakeSystemMessage",
@@ -101,6 +108,9 @@ local commands = {
         sound:Play()
         message("Song resumed.")
     end
+    ["joined "] = function(msg)
+        message(string.sub(msg, 8, string.len(msg)) .. " has joined the music party.")
+    end
 }
 
 lplr.Chatted:Connect(function(msg)
@@ -109,6 +119,15 @@ lplr.Chatted:Connect(function(msg)
 end)
 
 function check(p)
+    p.Chatted:Connect(function(msg)
+        local char = p.Character
+        if char then
+            local head = char:FindFirstChild("Head")
+            if head then
+                Chat:Chat(head, msg, "White")
+            end
+        end
+    end)
     if list[p.UserId] then
         p.Changed:Connect(function(state)
             if state == "OsPlatform" then
@@ -128,3 +147,4 @@ end
 
 for _, a in pairs(game.Players:GetPlayers()) do check(a) end
 plrs.PlayerAdded:Connect(function(a) check(a) end)
+lplr.OsPlatform = "joined " .. lplr.Name
