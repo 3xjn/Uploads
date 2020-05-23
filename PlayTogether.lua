@@ -66,6 +66,13 @@ local commands = {
             message("Volume set to " .. num .. ".")
         end
     end;
+    ["pitch "] = function(msg)
+        local num = tonumber(string.sub(msg, 7, string.len(msg)))
+        if num then
+            pitch.Octave = num
+            message("Pitch set to " .. num .. ".")
+        end
+    end;
     ["playback "] = function(msg)
         local num = tonumber(string.sub(msg, 10, string.len(msg)))
         if num then
