@@ -107,7 +107,7 @@ local commands = {
     ["play"] = function()
         sound:Play()
         message("Song resumed.")
-    end
+    end;
     ["joined "] = function(msg)
         message(string.sub(msg, 8, string.len(msg)) .. " has joined the music party.")
     end
