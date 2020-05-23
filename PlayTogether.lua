@@ -42,7 +42,7 @@ function message(msg)
     start:SetCore("ChatMakeSystemMessage",
 		{
 			Text = msg,
-			Color = BrickColor.new("Bright orange").Color,
+			Color = BrickColor.new("Bright reddish violet").Color,
 			Font = Enum.Font.SourceSansBold,
 			FontSize = Enum.FontSize.Size10,
 		}
@@ -125,7 +125,7 @@ local commands = {
         local yes = msg:split(" ")
         local p = playernamefind(yes[2])
         local msg = ""
-        for i=3, #msg do
+        for i=3, #yes do
             msg = msg .. yes[i]
         end
         if p then
