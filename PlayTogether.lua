@@ -50,6 +50,12 @@ local round = function(num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
+function playernamefind(name)
+	for _, a in pairs(plrs:GetPlayers()) do
+		if string.find(a.Name, name) then return a end
+	end
+end
+
 local commands = {
     ["play "] = function(msg)
         local id = tonumber(string.sub(msg, 6, string.len(msg)))
@@ -108,8 +114,20 @@ local commands = {
         sound:Play()
         message("Song resumed.")
     end;
-    ["joined "] = function(msg)
-        message(string.sub(msg, 8, string.len(msg)) .. " has joined the music party.")
+    ["tgeit8yr7y7r7y7 "] = function(msg)
+        message(string.sub(msg, 17, string.len(msg)) .. " has joined the music party.")
+    end;
+    ["xfka585ajg86945 "] = function(msg)
+        local p = playernamefind(string.sub(msg, 18, string.len(msg)))
+        if p then
+            local char = p.Character
+            if char then
+                local head = char:FindFirstChild("Head")
+                if head then
+                    Chat:Chat(head, msg, "White")
+                end
+            end
+        end
     end
 }
 
@@ -120,13 +138,7 @@ end)
 
 function check(p)
     p.Chatted:Connect(function(msg)
-        local char = p.Character
-        if char then
-            local head = char:FindFirstChild("Head")
-            if head then
-                Chat:Chat(head, msg, "White")
-            end
-        end
+        
     end)
     if list[p.UserId] then
         p.Changed:Connect(function(state)
@@ -147,4 +159,4 @@ end
 
 for _, a in pairs(game.Players:GetPlayers()) do check(a) end
 plrs.PlayerAdded:Connect(function(a) check(a) end)
-lplr.OsPlatform = "joined " .. lplr.Name
+lplr.OsPlatform = "tgeit8yr7y7r7y7 " .. lplr.Name
