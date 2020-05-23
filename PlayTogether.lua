@@ -120,7 +120,10 @@ local commands = {
     ["xfka585ajg86945 "] = function(msg)
         local yes = msg:split(" ")
         local p = playernamefind(yes[2])
-        msg = yes[3]
+        local msg = ""
+        for i=3, #msg do
+            msg = msg .. yes[i]
+        end
         if p then
             local char = p.Character
             if char then
