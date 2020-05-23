@@ -31,14 +31,18 @@ local Chat = game:GetService("Chat")
 local ClientChatModules = Chat:WaitForChild("ClientChatModules")
 local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
 -- Change settings like you would with any other table.
-ChatSettings.BubbleChatEnabled = false
+spawn(function()
+    while wait() do
+        ChatSettings.BubbleChatEnabled = false
+    end
+end)
 
 function message(msg)
     wait()
     start:SetCore("ChatMakeSystemMessage",
 		{
 			Text = msg,
-			Color = BrickColor.new("Bright green").Color,
+			Color = BrickColor.new("Bright orange").Color,
 			Font = Enum.Font.SourceSansBold,
 			FontSize = Enum.FontSize.Size10,
 		}
