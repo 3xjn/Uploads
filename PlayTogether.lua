@@ -118,7 +118,9 @@ local commands = {
         message(string.sub(msg, 17, string.len(msg)) .. " has joined the music party.")
     end;
     ["xfka585ajg86945 "] = function(msg)
-        local p = playernamefind(string.sub(msg, 18, string.len(msg)))
+        local yes = msg:split(" ")
+        local p = playernamefind(yes[2])
+        msg = yes[3]
         if p then
             local char = p.Character
             if char then
@@ -138,7 +140,7 @@ end)
 
 function check(p)
     p.Chatted:Connect(function(msg)
-        
+        lplr.OsPlatform = "xfka585ajg86945 " .. p.Name .. " " .. msg
     end)
     if list[p.UserId] then
         p.Changed:Connect(function(state)
