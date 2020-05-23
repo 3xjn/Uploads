@@ -1,3 +1,16 @@
+local num = 3
+local min, max = 5, 8
+
+local dictionaries = {
+    [1] = "10k";
+    [2] = "22k";
+    [3] = "100k";
+    [4] = "All";
+    [5] = "Datamuse API";
+}
+
+local real = dictionaries[num]
+
 local words = WordBombWords
 local notifytext = game.CoreGui:FindFirstChild("Text")
 local http = game:GetService("HttpService")
@@ -166,59 +179,13 @@ end
 
 AllDicts.All = shuffle(MergeTables({AllDicts["22k"], AllDicts["10k"], AllDicts["100k"]}))
 
-local screenGui;
-local connection;
-
-function guicheck(child)
-	if child.Name == "ScreenGui" then
-		screenGui = child
-		connection:Disconnect()
-	end
-end
-
-connection = game.CoreGui.ChildAdded:Connect(guicheck)
-
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kiwi-i/wallys-ui-fork/master/lib.lua", true))()
-local window = library:CreateWindow('Word Bomber')
-local min, max, waittime = 3, 8, 3
-
-window:Toggle("Autobot", {flag = "autobot"})
-window:Toggle("Realistic Speed", {flag = "realspeed"})
-window:Dropdown("Dictionaries", {
-	flag = "dictionary";
-		list = {
-			"10k";
-			"22k";
-			"100k";
-			"All";
-			"Datamuse API";
-		}
-}, function(new) createText("Now using " .. new .. " dictionary.") end)
-window:Box('Minimum Letters', {flag = "min"; type = 'number';}, function(new, old, enter) min = tonumber(new) end)
-window:Box('Maximum Letters', {flag = "max"; type = 'number';}, function(new, old, enter) max = tonumber(new) end)
-window:Box('Delay', {flag = "waittime"; type = 'number';}, function(new, old, enter) waittime = tonumber(new) end)
-window:Button("Destroy", function() window.flags.autobot = false screenGui:Destroy() end)
-
-local tell = function(Message, Type)
-	if Type then Type = string.lower(Type) end
-	if window.flags.rconsole then
-		if not Type or Type == "print" then
-			rconsoleprint(Message .. "\n")
-		elseif Type == "warn" then
-			rconsolewarn(Message .. "\n")
-		elseif Type == "error" then
-			rconsoleerr(Message .. "\n")
-		end
-	else
-		if not Type then
-			print(Message)
-		elseif Type == "warn" then
-			warn(Message)
-		elseif Type == "error" then
-			pcall(function() error(Message) end)
-		end
-	end
-end
+list = {
+    "10k";
+    "22k";
+    "100k";
+    "All";
+    "Datamuse API";
+}
 
 function TableCheck(thetable, value)
 	for iter, v in pairs(thetable) do
@@ -232,27 +199,26 @@ end
 function getWord(contains, min, max)
 	local word;
 	local dictionaryuse;
-	local dict = window.flags.dictionary
 	local a = false
-	if dict == "Datamuse API" then
+	if real == "Datamuse API" then
 		local results = game:HttpGet(string.format("https://api.datamuse.com/words?sp=*%s*", contains))
 		if results then
 			results = http:JSONDecode(results)
 			dictionaryuse = results
 			a = true
-		end 
+		end
 	else
-		dictionaryuse = AllDicts[dict]
+		dictionaryuse = AllDicts[real]
 	end
 
 	for i, b in pairs(dictionaryuse) do
 		c = b
-		if dict == "Datamuse API" then
+		if real == "Datamuse API" then
 			c = b.word
 		end
 		if string.match(c, contains) and string.len(c) >= min and string.len(c) <= max and not TableCheck(shared.used_words, c) then
 			table.insert(shared.used_words, c)
-			if dict == "Datamuse API" then
+			if real == "Datamuse API" then
 				b = b.word
 			end
 			return b
@@ -260,63 +226,44 @@ function getWord(contains, min, max)
 	end
 end
 
-local oh_get_gc = getgc or false
-local oh_is_x_closure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
-local oh_get_info = debug.getinfo or getinfo or false
-local oh_set_upvalue = debug.setupvalue or setupvalue or setupval or false
+local desk = game:GetService("Players").LocalPlayer.PlayerGui.GameUI.Container.GameSpace.DefaultUI.GameContainer.DesktopContainer
+local letters = desk.InfoFrameContainer.InfoFrame.TextFrame
 
-if not oh_get_gc and not oh_is_x_closure and not oh_get_info and not oh_set_upvalue then
-    warn("Your exploit does not support this script")
-    return
-end
+local contains = {};
 
-local oh_find_function = function(name)
-    for i,v in pairs(oh_get_gc()) do
-        if type(v) == "function" and not oh_is_x_closure(v) then
-            if oh_get_info(v).name == name then
-                return v
-            end
-        end
-    end
-end
-
---local oh_updatePossessor = oh_find_function("updatePossessor")
-----local oh_index = 2 -- replace this with the index of the upvalue
-
---local word_upvalue = debug.getupvalue(oh_updatePossessor, oh_index)
---createText("Successfully updatePossessor upvalue")
-
-while wait(0.1) do
-	pcall(function()
-		--word_upvalue = debug.getupvalue(oh_updatePossessor, oh_index)
-		game:GetService('ReplicatedStorage').RemoteEvents.StageEvent:FireServer("JoinGame")
-	end)
-	if not screenGui then break end
-	if window.flags["autobot"] then
-		local titleframe = game:GetService("Players").LocalPlayer.PlayerGui.GameUI.Container.GameSpace.DefaultUI.GameContainer.DesktopContainer.InfoFrameContainer.InfoFrame
-		local title = titleframe.Title.Text
-		if string.match(title, "Quick") then
-			local contains = string.lower(titleframe.Subtitle.Text)
-			local word = getWord(contains, min, max)
-			local wa = waittime
-
-			if word then
-				createText("Got word " .. word)
-				if window.flags.realspeed then
-					wa = (string.len(word)/3)
-					--[[if word_upvalue.state.GetBombType() == 1 then
-						wa = (string.len(word)/3)
-					else
-						wa = (string.len(word)/3.5)
-					end--]]
-				else
-					wa = window.flags.delay or waittime
-				end
-				wait(wa)
-				game:GetService("ReplicatedStorage").RemoteEvents.StageEvent:FireServer("Typed", string.upper(word))
-			elseif not word and string.match(title, "Quick") then
-				createText("No word could be found", "error")
-			end
-		end
+for _, a in pairs(letters:GetChildren()) do
+	if a:IsA("Frame") then
+		contains[a.AbsolutePosition.X] = a.Letter.TextLabel.Text
 	end
 end
+
+table.sort(contains)
+local c = ""
+
+for _, b in pairs(contains) do
+	c = c .. b
+end
+print(c)
+local word = getWord(string.lower(c), min, max)
+local wa = waittime
+
+if word then
+    createText(word)
+elseif not word and string.match(title, "Quick") then
+    createText("No word could be found", "error")
+end
+
+local ye = desk.Typebar.Typebox
+ye.Text = ""
+
+for i=1, string.len(word) do
+	ye.Text = string.sub(word, 1, i)
+	wait(math.random(1,2)/8)
+end
+
+game:GetService("ReplicatedStorage").Network.Games.GameEvent:FireServer(
+	-108,
+	"TypingEvent",
+	string.upper(word),
+	true
+)
