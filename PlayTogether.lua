@@ -24,13 +24,14 @@ if not pitch then
 end
 pitch.Enabled = true
 pitch.Parent = sound
+local start = game:GetService('StarterGui')
 
 function message(msg)
     wait()
-    game:GetService('StarterGui'):SetCore("ChatMakeSystemMessage",
+    start:SetCore("ChatMakeSystemMessage",
 		{
 			Text = msg,
-			Color = BrickColor.new("Gold").Color,
+			Color = BrickColor.new("Bright green").Color,
 			Font = Enum.Font.SourceSansBold,
 			FontSize = Enum.FontSize.Size10,
 		}
@@ -69,12 +70,14 @@ local commands = {
         local num = tonumber(string.sub(msg, 7, string.len(msg)))
         if num then
             pitch.Octave = num
+            message("Pitch set to " .. num .. ".")
         end
     end;
     ["playback "] = function(msg)
         local num = tonumber(string.sub(msg, 10, string.len(msg)))
         if num then
             sound.PlaybackSpeed = num
+            message("Playback speed set to " .. num .. ".")
         end
     end;
     ["reset"] = function()
