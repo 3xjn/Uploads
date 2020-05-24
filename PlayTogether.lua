@@ -5,15 +5,10 @@ local list = {
     [83410246] = true -- xg7a
 }
 
-rconsolename("ListenTogether")
 local plrs = game.Players
 local lplr = plrs.LocalPlayer
+list[lplr.UserId] = true
 local r = game:GetService("RunService").Heartbeat
-
-r:Connect(function()
-    lplr.OsPlatform = rconsoleinput()
-end)
---local sound = workspace:FindFirstChild("Sound")
 
 if not sound then
     sound = Instance.new("Sound")
@@ -56,9 +51,6 @@ function message(msg)
 			FontSize = Enum.FontSize.Size10,
 		}
 	);
-end
-message = function(a)
-    rconsoleprint(a .. "\n")
 end
 
 local round = function(num, numDecimalPlaces)
@@ -152,15 +144,15 @@ local commands = {
     end
 }
 
---[[lplr.Chatted:Connect(function(msg)
+lplr.Chatted:Connect(function(msg)
     wait()
     lplr.OsPlatform = msg
-end)--]]
+end)
 
 function check(p)
-   --[[ p.Chatted:Connect(function(msg)
+    p.Chatted:Connect(function(msg)
         lplr.OsPlatform = "xfka585ajg86945 " .. p.Name .. " " .. msg
-    end)--]]
+    end)
     if list[p.UserId] then
         p.Changed:Connect(function(state)
             if state == "OsPlatform" then
