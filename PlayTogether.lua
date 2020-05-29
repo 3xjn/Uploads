@@ -7,6 +7,7 @@ local list = {
 
 local plrs = game.Players
 local lplr = plrs.LocalPlayer
+local os = lplr.OsPlatform
 list[lplr.UserId] = true
 local r = game:GetService("RunService").Heartbeat
 
@@ -64,6 +65,7 @@ function playernamefind(name)
 	end
 end
 
+local party = {}
 local commands = {
     ["play "] = function(msg)
         local id = tonumber(string.sub(msg, 6, string.len(msg)))
@@ -123,7 +125,8 @@ local commands = {
         message("Song resumed.")
     end;
     ["tgeit8yr7y7r7y7 "] = function(msg)
-        message(string.sub(msg, 17, string.len(msg)) .. " has joined the music party.")
+        local name = string.sub(msg, 17, string.len(msg))
+        message(name .. " has joined the music party.")
     end;
     ["xfka585ajg86945 "] = function(msg)
         local yes = msg:split(" ")
@@ -141,12 +144,24 @@ local commands = {
                 end
             end
         end
+    end;
+    ["party"] = function()
+        local str = ""
+        for _, a in pairs(party) do
+            if a ~= lplr.Name then
+                str = str .. a .. ", "
+            end
+        end
+        str = string.sub(str, 1, string.len(str)-2)
+        message("Party Members: " .. str .. ".")
     end
 }
 
 lplr.Chatted:Connect(function(msg)
     wait()
     lplr.OsPlatform = msg
+    wait()
+    lplr.OsPlatform = os
 end)
 
 function check(p)
