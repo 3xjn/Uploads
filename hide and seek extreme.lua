@@ -155,8 +155,14 @@ end)
 
 local parentBox;
 parentBox = section2:addTextbox("Parent", musicProp.Parent.Name, function(value, focuslost)
-    if focustlost then
-        local obj = clientChar:FindFirstChild(value)
+    if focuslost then
+        local obj = game
+
+        for _, a in pairs(value:split(".")) do
+            print(a)
+            obj = obj[a]
+        end
+
         if obj then
             musicProp.Parent = obj
         else
@@ -166,23 +172,31 @@ parentBox = section2:addTextbox("Parent", musicProp.Parent.Name, function(value,
 end)
 
 section2:addButton("Play", function()
-    local instance = Instance.new("Sound")
-    for k, v in pairs(musicProp) do
-        instance[k] = v
-    end
+    spawn(function()
+        print("created instance")
+        local instance = Instance.new("Sound")
+        for k, v in pairs(musicProp) do
+            print("set",k,"equal to",tostring(v))
+            instance[k] = v
+        end
 
-    local copy = copyTable(musicProp)
+        local copy = copyTable(musicProp)
 
-    instance.SoundId = "rbxassetid://" .. copy.SoundId
-    instance:Play()
+        instance.SoundId = "rbxassetid://" .. copy.SoundId
+        print("soundid to", instance.SoundId)
+        repeat wait() until instance.IsLoaded
+        instance:Play()
+        print("Playing song and settings soundid to nil")
 
-    copy.SoundId = nil
+        copy.SoundId = nil
 
-    game:GetService("ReplicatedStorage").Remotes.PlaySoundOthers:FireServer(id, info)
+        game:GetService("ReplicatedStorage").Remotes.PlaySoundOthers:FireServer(id, info)
+        print("fire server")
+    end)
 end)
 
 -- second page
-local theme = venyx:addPage("Ui", 5012544693)
+local theme = venyx:addPage("Ui", 5107141151)
 local keybinds = theme:addSection("Keybinds")
 
 keybinds:addKeybind("Toggle Keybind", Enum.KeyCode.Tab, function()
