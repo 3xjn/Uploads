@@ -118,7 +118,9 @@ local musicProp = {
     SoundId = "id here";
     Volume = 1;
     Pitch = 1;
-    Parent = clientChar.HumanoidRootPart
+    Parent = clientChar.HumanoidRootPart;
+    MaxDistance = 100;
+    EmitterSize = 10;
 }
 local page = venyx:addPage("Music", 302250236)
 local section2 = page:addSection("Properties")
@@ -156,42 +158,38 @@ end)
 local parentBox;
 parentBox = section2:addTextbox("Parent", musicProp.Parent.Name, function(value, focuslost)
     if focuslost then
-        local obj = game
+        local vals = value:split(".")
+        local obj = vals[1]
+        table.remove(vals, 1)
 
-        for _, a in pairs(value:split(".")) do
+        for _, a in pairs(vals) do
             print(a)
             obj = obj[a]
         end
 
         if obj then
             musicProp.Parent = obj
-        else
-            section2:updateTextbox(parentBox, musicProp.Parent.Name)
         end
+
+        section2:updateTextbox(parentBox, musicProp.Parent.Name)
     end
 end)
 
 section2:addButton("Play", function()
     spawn(function()
-        print("created instance")
+        local c = copyTable(musicProp)
+        local ohNumber1 = c.SoundId
+        c.SoundId = nil
+        
+        local ohTable2 = c
         local instance = Instance.new("Sound")
-        for k, v in pairs(musicProp) do
-            print("set",k,"equal to",tostring(v))
+        for k, v in pairs(ohTable2) do
             instance[k] = v
         end
-
-        local copy = copyTable(musicProp)
-
-        instance.SoundId = "rbxassetid://" .. copy.SoundId
-        print("soundid to", instance.SoundId)
-        repeat wait() until instance.IsLoaded
+        instance.SoundId = "rbxassetid://" .. ohNumber1
         instance:Play()
-        print("Playing song and settings soundid to nil")
 
-        copy.SoundId = nil
-
-        game:GetService("ReplicatedStorage").Remotes.PlaySoundOthers:FireServer(id, info)
-        print("fire server")
+        game:GetService("ReplicatedStorage").Remotes.PlaySoundOthers:FireServer(ohNumber1, ohTable2)
     end)
 end)
 
